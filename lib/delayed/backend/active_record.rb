@@ -28,6 +28,9 @@ module Delayed
         scope :ready_to_run, lambda {|worker_name, max_run_time|
           where(['(run_at <= ? AND (locked_at IS NULL OR locked_at < ?) OR locked_by = ?) AND failed_at IS NULL', db_time_now, db_time_now - max_run_time, worker_name])
         }
+        
+        scope :with_context, lambda { |value| where(:context => value) }
+        
         scope :by_priority, order('priority ASC, run_at ASC')
 
         def self.before_fork
@@ -44,8 +47,8 @@ module Delayed
         end
 
         # Find a few candidate jobs to run (in case some immediately get locked by others).
-        def self.find_available(worker_name, limit = 5, max_run_time = Worker.max_run_time)
-          scope = self.ready_to_run(worker_name, max_run_time)
+        def self.find_available(worker_name, limit = 5, max_run_time = Worker.max_run_time, Worker.context)
+          scope = self.ready_to_run(worker_name, max_run_time).with_context(context)
           scope = scope.scoped(:conditions => ['priority >= ?', Worker.min_priority]) if Worker.min_priority
           scope = scope.scoped(:conditions => ['priority <= ?', Worker.max_priority]) if Worker.max_priority
 

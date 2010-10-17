@@ -13,6 +13,7 @@ module Delayed
         def enqueue(*args)
           options = {
             :priority => Delayed::Worker.default_priority
+            :context => Delayed::Worker.context
           }
 
           if args.size == 1 && args.first.is_a?(Hash)
@@ -21,6 +22,7 @@ module Delayed
             options[:payload_object]  = args.shift
             options[:priority]        = args.first || options[:priority]
             options[:run_at]          = args[1]
+            options[:context]         = args[2] || options[:context]
           end
 
           unless options[:payload_object].respond_to?(:perform)
