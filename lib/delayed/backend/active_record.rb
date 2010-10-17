@@ -47,7 +47,7 @@ module Delayed
         end
 
         # Find a few candidate jobs to run (in case some immediately get locked by others).
-        def self.find_available(worker_name, limit = 5, max_run_time = Worker.max_run_time, Worker.context)
+        def self.find_available(worker_name, limit = 5, max_run_time = Worker.max_run_time, context = Worker.context)
           scope = self.ready_to_run(worker_name, max_run_time).with_context(context)
           scope = scope.scoped(:conditions => ['priority >= ?', Worker.min_priority]) if Worker.min_priority
           scope = scope.scoped(:conditions => ['priority <= ?', Worker.max_priority]) if Worker.max_priority
