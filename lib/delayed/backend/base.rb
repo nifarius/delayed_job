@@ -12,7 +12,7 @@ module Delayed
         # Add a job to the queue
         def enqueue(*args)
           options = {
-            :priority => Delayed::Worker.default_priority
+            :priority => Delayed::Worker.default_priority,
             :context => Delayed::Worker.context
           }
 
