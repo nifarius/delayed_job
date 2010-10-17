@@ -43,7 +43,7 @@ module Delayed
 
         # When a worker is exiting, make sure we don't have any locked jobs.
         def self.clear_locks!(worker_name)
-          update_all("locked_by = null, locked_at = null", ["locked_by = ?", worker_name])
+          update_all("locked_by = null, locked_at = null", ["locked_by = ? AND context = ?", worker_name, Worker.context])
         end
 
         # Find a few candidate jobs to run (in case some immediately get locked by others).
